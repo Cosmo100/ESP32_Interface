@@ -1,3 +1,6 @@
+
+//Empfängt den Datenstrom des Raspberry und gibt diesen an Virtuino weiter
+
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <HTTPClient.h>
