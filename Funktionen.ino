@@ -190,7 +190,7 @@ void VituinoAbfragen()
 	}
 	V[60] = V[56] + V[58];	//Pool Leistung B + PV2Leistung
 	V[61] = -(V[60]) + Stromwert(341);	//PV-Leistung gesamt + aktuelle Leistung Hauptstromzähler
-
+	V[62] = StromDiff;
 	V[79] = Neustarts;
 
 	/*
@@ -269,12 +269,15 @@ void StandGesternVonRaspberryLesen()
 		GasGestern = SelektiereWert(Inhalt, "ZSGas=");
 		WasserGestern = SelektiereWert(Inhalt, "ZSWasser=");
 		BrauchwasserGestern = SelektiereWert(Inhalt, "ZSBrauchwasser=");
+		StromGestern = SelektiereWert(Inhalt, "ZSHauptZ=");
 		Serial.print("GasGestern = ");
 		Serial.println(GasGestern);
 		Serial.print("WasserGestern = ");
 		Serial.println(WasserGestern);
 		Serial.print("BrauchwasserGestern = ");
 		Serial.println(BrauchwasserGestern);
+		Serial.print("StromGestern = ");
+		Serial.println(StromGestern);
 	}
 	else {
 		Serial.println("Fehler beim Abrufen der Datei");
@@ -315,12 +318,25 @@ void AktuellerZaehlerstand()
 	GasHeute = StandHeute(298);
 	WasserHeute=StandHeute(301);
 	BrauchwasserHeute=StandHeute(295);
+	StromHeute = StandStrom();
 
 	GasDiff = (GasHeute - GasGestern) * 1000;
 	WasserDiff = (WasserHeute - WasserGestern) * 1000;
 	BrauchwasserDiff = (BrauchwasserHeute - BrauchwasserGestern) * 1000;
+	StromDiff = (StromHeute -StromGestern) * 1000;
 
-/*
+/*	
+	Serial.print("StromHeute = ");
+	Serial.println(StromHeute);
+	Serial.print("StromGestern = ");
+	Serial.println(StromGestern);
+	Serial.print("StromDiff = ");
+	Serial.println(StromDiff);
+
+	Serial.print("Strom[");
+	Serial.print(String(Neustarts));
+	Serial.println("]");
+
 	Serial.print("GasHeute = ");
 	Serial.println(GasHeute);
 	Serial.print("WasserHeute = ");
@@ -335,12 +351,35 @@ void AktuellerZaehlerstand()
 	Serial.println(WasserDiff);*/
 	
 }
+
+//********************************************************************
+float StandStrom ()
+{
+uint32_t zahl = (uint32_t)Byts[334] |
+((uint32_t)Byts[333] << 8) |
+((uint32_t)Byts[332] << 16) |
+((uint32_t)Byts[331] << 24);
+
+// Division durch 10000
+float Erg = zahl / 10000.0;
+
+return Erg;
+
+}
+
 //********************************************************************
 void SendeNeustarts()
 {
 	Serial.print("Neustarts[");
 	Serial.print(String(Neustarts));
 	Serial.println("]");
+}
+
+//********************************************************************
+void SendeWert(String Bez,float Wert)
+{
+	String Sende = Bez + "[" + String(Wert) + "]";
+	Serial.println(Sende);
 }
 
 //###############################################################################################

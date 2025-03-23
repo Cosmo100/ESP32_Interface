@@ -37,13 +37,16 @@ float NiveauAltPool;
 float GasGestern;
 float WasserGestern;
 float BrauchwasserGestern;
+float StromGestern;
 
 float GasDiff;
 float WasserDiff;
 float BrauchwasserDiff;
+float StromDiff;
 float GasHeute;
 float WasserHeute;
 float BrauchwasserHeute;
+float StromHeute;
 
 WiFiUDP ntpUDP;
 WiFiServer server(6222);                   // Default Virtuino Server port 
@@ -106,9 +109,14 @@ void loop() {
   {
 	  Sendezeit = millis();
 	  DatenAbholen();
-	  if (GasGestern < 9000 || WasserGestern < 175 || BrauchwasserGestern < 1900)  StandGesternVonRaspberryLesen();
-
+	  if (GasGestern < 9200 || WasserGestern < 180 || BrauchwasserGestern < 1950 || StromGestern < 10000)  StandGesternVonRaspberryLesen();
 	  SendeNeustarts();
+	
+	  SendeWert("Gas", GasDiff);
+	  SendeWert("Wasser", WasserDiff);
+	  SendeWert("Strom",StromDiff);
+	  SendeWert("Brauchwasser",BrauchwasserDiff);
+
 	  AktuellerZaehlerstand(); //Gas und Wasser, Brauchwasser
 	/*
 	  Serial.print(Byts[122]);
