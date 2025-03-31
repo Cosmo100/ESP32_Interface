@@ -376,7 +376,7 @@ void ZeitSetzen()
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 String AktuelleZeit()
 {
-	char Zeit[11];  // "[hh:mm:ss]\0" -> 11 Zeichen
+	char Zeit[9];  // "hh:mm:ss\0" -> 9 Zeichen
 		
 	if (getLocalTime(&timeinfo))
 	{
