@@ -4,21 +4,18 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <HTTPClient.h>
-#include <NTPClient.h>
-#include <TimeLib.h>
 #include <EEPROM.h>
-#include "esp_task_wdt.h"
 #include "VirtuinoCM.h"
 #include "Zugang.h"
+#include "time.h"
+#include "esp_task_wdt.h"
 
-
-#define WDT_TIMEOUT 10		//Timeout in Sekunden (Watchdog)
+#define WDT_TIMEOUT 30		//Timeout in Sekunden (Watchdog)
 #define EEPROM_SIZE 10		// Anzahl der Bytes, die im Flash reserviert werden sollen
 
 // UDP-Parameter
 WiFiUDP udp;
 const int localUdpPort = 1902; // Port, auf dem der ESP32 hört
-char incomingPacket[1500];      // Puffer für eingehende Nachrichten
 uint8_t Byts[360];
 size_t BytsLen = 0;
 char packetBuffer[1500]; // Puffer für eingehende Pakete
@@ -26,7 +23,7 @@ char packetBuffer[1500]; // Puffer für eingehende Pakete
 #define V_memory_count 82         // the size of V memory. You can change it to a number <=255)
 float V[V_memory_count];           // This array is synchronized with Virtuino V memory. You can change the type to int, long etc.
 String Text_0 = "";                      // This text variable is synchronized with the Virtuino pin Text_0 
-String Text_1 = "";                      // This text variable is synchronized with the Virtuino pin Text_1
+//String Text_1 = "";                      // This text variable is synchronized with the Virtuino pin Text_1
 float S[V_memory_count];           // This array is synchronized with Virtuino V memory. You can change the type to int, long etc.
 
 float NiveauAlt1;
@@ -48,19 +45,17 @@ float WasserHeute;
 float BrauchwasserHeute;
 float StromHeute;
 
-WiFiUDP ntpUDP;
 WiFiServer server(6222);                   // Default Virtuino Server port 
 VirtuinoCM virtuino;
-NTPClient timeClient(ntpUDP, "pool.ntp.org");
-unsigned long epochTime;
-String Zeitstring;
-String Startzeit;
+
+const char* TZ_INFO = "CET-1CEST,M3.5.0,M10.5.0/3";    //Wird benötigt für NTP-Zeit
+struct tm timeinfo;
+
 int Neustarts;
 
 bool debug = false;
 unsigned long Sendezeit = millis();
 const int Sendepause = 3000;  //Sendepause in Sekunden zur Datenuebertragungin msec
-
 
 void setup() {
   Serial.begin(115200);
@@ -100,6 +95,7 @@ void setup() {
 
   esp_task_wdt_init(WDT_TIMEOUT, true);
   esp_task_wdt_add(NULL); //add current thread to WDT watch
+  
 }
 
 void loop() {
@@ -108,43 +104,29 @@ void loop() {
   if (millis() > Sendezeit + Sendepause)  //wenn die Zeit sich ge�ndert hat
   {
 	  Sendezeit = millis();
-	  DatenAbholen();
-	  if (GasGestern < 9200 || WasserGestern < 180 || BrauchwasserGestern < 1950 || StromGestern < 10000)  StandGesternVonRaspberryLesen();
-	  SendeNeustarts();
-	
-	  SendeWert("Gas", GasDiff);
-	  SendeWert("Wasser", WasserDiff);
-	  SendeWert("Strom",StromDiff);
-	  SendeWert("Brauchwasser",BrauchwasserDiff);
+	  SendeWert("Zeit", AktuelleZeit());
+	  SendeWert("Neustarts",  String(Neustarts));
 
+	  DatenAbholen();
+	 if (GasGestern < 9300 || WasserGestern < 180 || BrauchwasserGestern < 1950 || StromGestern < 10000)  StandGesternVonRaspberryLesen();
+	
 	  AktuellerZaehlerstand(); //Gas und Wasser, Brauchwasser
-	/*
-	  Serial.print(Byts[122]);
-	  Serial.print(" - ");
-	  Serial.println(Byts[123]);
-	  Serial.print(Byts[130]);
-	  Serial.print(" - ");
-	  Serial.println(Byts[131]);
-		
-	  Serial.print("Byts[339]");
-	  Serial.print(" - ");
-	  Serial.print(Byts[339]);
-	  Serial.print(" - ");
-	  Serial.print(Byts[340]);
-	  Serial.print(" - ");
-	  Serial.print(Byts[341]);
-	  Serial.print(" - ");
-	  Serial.print(Byts[342]);
-	  Serial.print(" - ");
-	  Serial.println(Stromwert(341));
-	  */
+
+	  SendeWert("Gas", String(GasDiff));
+	  SendeWert("Wasser", String(WasserDiff));
+	  SendeWert("Strom", String(StromDiff));
+	  SendeWert("Brauchwasser", String(BrauchwasserDiff));
+
 	  Serial.println();
  }
 
   VituinoAbfragen();
   PCBefehlAbfragen();
 
-  esp_task_wdt_reset(); //Reset watchdog
+  if (timeinfo.tm_year < (2020 - 1900)) {
+	 Serial.println("❌ Zeit ungültig (vermutlich 1970-01-01)!");
+	 ZeitSetzen();
+ }
 
-  if (epochTime < 1000)  ZeitSetzen(); // ZeitPruefen
+ esp_task_wdt_reset(); //Reset watchdog
 }

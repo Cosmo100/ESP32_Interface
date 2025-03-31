@@ -20,7 +20,6 @@ void DatenAbholen()
 	int packetSize = udp.parsePacket(); // Prüfen, ob ein Paket empfangen wurde
 
 	if (packetSize) {
-		Serial.println(AktuelleZeit());
 		Serial.print("Paketgroesse[");
 		Serial.print(packetSize);
 		Serial.println("]");
@@ -46,8 +45,7 @@ void DatenAbholen()
 		Serial.print("Anz Bytes[");
 		Serial.print(BytsLen);
 		Serial.println("]");
-		
-		
+	
 	}
 }
 
@@ -57,63 +55,6 @@ float ZweiByteStrom(int ST)
 	int16_t result = (int16_t(Byts[ST]) << 8) | Byts[ST + 1];
 	return (float) result / 10;
 	}
-//==============================================================
-void ZeitSetzen()
-{
-	Serial.println("Hole Zeit");
-
-	timeClient.begin();
-	//Offset in Sekunden zur GMT +/- 0 Zeitzone
-	//Fuer Deutschland muss man 1h = 3600 Sekunden nehmen,
-	//je nach Sommer- /Winterzeit muss noch zus?tzlich eine 1h (also 3600 Sekunden)
-	//auf diese Zeit draufaddiert werden.
-	timeClient.setTimeOffset(3600);
-
-	timeClient.update();
-	Startzeit = timeClient.getFormattedDate();
-	Zeitstring = "Datum=" + Startzeit + "\n";
-
-	Serial.println(Zeitstring);
-	epochTime = timeClient.getEpochTime();
-	setTime(epochTime);
-	timeClient.end();
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-String AktuelleZeit()
-{
-	String Zeit;
-	String Std = String(hour());
-	String Min = String(minute());
-	String Sec = String(second());
-
-	if (hour() < 10) Std = String("0") + Std;
-	if (minute() < 10) Min = String("0") + Min;
-	if (second() < 10) Sec = String("0") + Sec;
-
-	Zeit = "["+Std + ":" + Min + ":" + Sec+"]";
-
-	//Um 01:01 Stand von gestern neu lesen
-	if (hour() == 1 && minute() < 5)  StandGesternVonRaspberryLesen();
-
-	return Zeit;
-
-}
-//==============================================================
-String AktuellesDatum()
-{
-	String Datum;
-	String Tag = String(day());
-	String Mon = String(month());
-	String Jahr = String(year());
-
-	if (day() < 10) Tag = String("0") + Tag;
-	if (month() < 10) Mon = String("0") + Mon;
-
-	Datum = Tag + "." + Mon + "." + Jahr;
-
-	return Datum;
-}
-//==============================================================
 
 //###############################################################################################
 void VituinoAbfragen()
@@ -214,7 +155,7 @@ void VituinoAbfragen()
 		}
 
 
-	if (hour() == 0 && minute() == 0)  NiveauAlt1 = 0;  //Um 0.00 Uhr AltNiveaus zurücksetzen
+//	if (hour() == 0 && minute() == 0)  NiveauAlt1 = 0;  //Um 0.00 Uhr AltNiveaus zurücksetzen
 }
 //###############################################################################################
 void BefehlVonAndroid()
@@ -313,7 +254,7 @@ float  SelektiereWert(String Inhalt, String Wert)
 }
 //==================================================================================================
 void AktuellerZaehlerstand()
-{	//Ruft aktuellen Zaehlerstand Gas und Wasser vom Raspberry  ab
+{	//Ruft aktuellen Zaehlerstand Gas, Wasser, Brauchwasser, Strom vom Raspberry  ab
 	
 	GasHeute = StandHeute(298);
 	WasserHeute=StandHeute(301);
@@ -368,17 +309,9 @@ return Erg;
 }
 
 //********************************************************************
-void SendeNeustarts()
+void SendeWert(String Bez,String Wert)
 {
-	Serial.print("Neustarts[");
-	Serial.print(String(Neustarts));
-	Serial.println("]");
-}
-
-//********************************************************************
-void SendeWert(String Bez,float Wert)
-{
-	String Sende = Bez + "[" + String(Wert) + "]";
+	String Sende = Bez + "[" + Wert + "]";
 	Serial.println(Sende);
 }
 
@@ -430,4 +363,34 @@ void LoescheNeustarts()
 	EEPROM.write(0, 0); //Setze Adresse 0 auf 0 Neustarts
 	EEPROM.commit(); // Damit die Daten tatsächlich in den Flash geschrieben werden
 	Neustarts = EEPROM.read(0); //Lese neue Anzahl von Neustarts Neustarts
+}
+//==============================================================
+void ZeitSetzen()
+{
+	Serial.println("Hole Zeit");
+	configTime(0, 0, "pool.ntp.org");
+	setenv("TZ", TZ_INFO, 1);
+	tzset();
+	AktuelleZeit();
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+String AktuelleZeit()
+{
+	char Zeit[11];  // "[hh:mm:ss]\0" -> 11 Zeichen
+		
+	if (getLocalTime(&timeinfo))
+	{
+		strftime(Zeit, sizeof(Zeit), "%H:%M:%S", &timeinfo);
+		Text_0 = Zeit;  //ohne Klammern an Virtuino übergeben
+
+		//Um 01:01 Stand von gestern neu lesen
+		if (timeinfo.tm_hour == 1 && timeinfo.tm_min < 5)  StandGesternVonRaspberryLesen();
+
+		return Zeit;
+	}
+	else {
+		Serial.println("Fehler beim Abrufen der Zeit");
+		return "00";
+	}
+
 }
