@@ -256,6 +256,8 @@ float  SelektiereWert(String Inhalt, String Wert)
 void AktuellerZaehlerstand()
 {	//Ruft aktuellen Zaehlerstand Gas, Wasser, Brauchwasser, Strom vom Raspberry  ab
 	
+	if (Byts[298] == 0 && Byts[299] == 0) return;
+		
 	GasHeute = StandHeute(298);
 	WasserHeute=StandHeute(301);
 	BrauchwasserHeute=StandHeute(295);
@@ -265,7 +267,7 @@ void AktuellerZaehlerstand()
 	WasserDiff = (WasserHeute - WasserGestern) * 1000;
 	BrauchwasserDiff = (BrauchwasserHeute - BrauchwasserGestern) * 1000;
 	StromDiff = (StromHeute -StromGestern) * 1000;
-
+	
 /*	
 	Serial.print("StromHeute = ");
 	Serial.println(StromHeute);
@@ -394,3 +396,17 @@ String AktuelleZeit()
 	}
 
 }
+//==============================================================
+String AktuellesDatum()
+{
+	char Datum[11];  // Format: "TT.MM.JJJJ" -> 10 Zeichen + Nullterminator
+	if (getLocalTime(&timeinfo)) {
+		// Datum als String formatieren
+
+		strftime(Datum, sizeof(Datum), "%d.%m.%Y", &timeinfo);
+		Text_1 = Datum;  //ohne Klammern an Virtuino übergeben
+		return Datum;
+	}
+}
+
+//==============================================================

@@ -13,7 +13,7 @@ void onReceived(char variableType, uint8_t variableIndex, String valueAsText) {
 	}
 	else  if (variableType == 'T') {
 		if (variableIndex == 0) Text_0 = valueAsText;          // Store the text to the text variable Text_0
-		//else if (variableIndex == 1) Text_1 = valueAsText;     // Store the text to the text variable Text_1
+		else if (variableIndex == 1) Text_1 = valueAsText;     // Store the text to the text variable Text_1
 		//else if (variableIndex == 2) Text_2 = valueAsText;     // Store the text to the text variable T2
 		//else if (variableIndex==3) T3=valueAsText;     // Store the text to the text variable T3
 
@@ -29,7 +29,7 @@ String onRequested(char variableType, uint8_t variableIndex) {
 	}
 	else if (variableType == 'T') {
 		if (variableIndex == 0) return Text_0;
-		//else if (variableIndex == 1) return Text_1;
+		else if (variableIndex == 1) return Text_1;
 		//else if (variableIndex == 2) return Text_2;
 		//else if (variableIndex==3) return T3;   
 	}

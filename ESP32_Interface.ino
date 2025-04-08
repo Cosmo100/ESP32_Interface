@@ -23,7 +23,7 @@ char packetBuffer[1500]; // Puffer für eingehende Pakete
 #define V_memory_count 82         // the size of V memory. You can change it to a number <=255)
 float V[V_memory_count];           // This array is synchronized with Virtuino V memory. You can change the type to int, long etc.
 String Text_0 = "";                      // This text variable is synchronized with the Virtuino pin Text_0 
-//String Text_1 = "";                      // This text variable is synchronized with the Virtuino pin Text_1
+String Text_1 = "";                      // This text variable is synchronized with the Virtuino pin Text_1
 float S[V_memory_count];           // This array is synchronized with Virtuino V memory. You can change the type to int, long etc.
 
 float NiveauAlt1;
@@ -90,8 +90,8 @@ void setup() {
   EEPROM.write(0, Neustarts);
   EEPROM.commit(); // Damit die Daten tatsächlich in den Flash geschrieben werden
 
-    AktuellerZaehlerstand(); //Gas und Wasser
-	StandGesternVonRaspberryLesen();
+  StandGesternVonRaspberryLesen();
+  AktuellerZaehlerstand(); //Gas und Wasser
 
   esp_task_wdt_init(WDT_TIMEOUT, true);
   esp_task_wdt_add(NULL); //add current thread to WDT watch
@@ -105,6 +105,7 @@ void loop() {
   {
 	  Sendezeit = millis();
 	  SendeWert("Zeit", AktuelleZeit());
+	  SendeWert("Datum", AktuellesDatum());
 	  SendeWert("Neustarts",  String(Neustarts));
 
 	  DatenAbholen();
