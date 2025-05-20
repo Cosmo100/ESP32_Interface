@@ -66,11 +66,11 @@ void VituinoAbfragen()
 	V[0] = Wert(0);		//Solarkollektor
 	V[1] = Wert(4);		//Warmwasser
 	V[2] = Wert(101);	//Aussentemp
-	V[3] = Wert(120);	//Kessel
-	V[4] = Wert(56);  //Temp Wohnzimmer
-	V[5] = Wert(58);  //Temp Schlafzimmer
-	V[6] = Wert(60);  //Temp Bad1
-	V[7] = Wert(62);  //Temp Bad2
+	V[3] = Wert(116);	//Kessel
+	V[4] = Wert(45);  //Temp Wohnzimmer
+	V[5] = Wert(47);  //Temp Schlafzimmer
+	V[6] = Wert(49);  //Temp Bad1
+	V[7] = Wert(51);  //Temp Bad2
 	V[8] = Wert(10); //Temp Arbeitszimmer
 	V[9] = Wert(196); //Temp Poolkollektor
 	V[10] = Wert(198); //Poolwasser Saugseite
@@ -93,12 +93,12 @@ void VituinoAbfragen()
 	V[24] = V[21] - NiveauAlt3;
 	V[25] = V[18] - NiveauAltPool;
 
-	V[26] = 10 * Wert(182); //Öffnung Garagenladen
-	V[27] = Wert(122) * 10; //Aktuelle PV-Leistung PV1
-	V[28] = Wert(130) * 10; //Aktuelle PV-Leistung PV2
-	V[29] = Wert(304) * 10; //Aktuelle Leistung PV2; Modul1
-	V[30] = Wert(310) * 10; //Aktuelle Leistung PV2; Modul2
-	V[31] = V[27] + V[28];
+	//V[26] = 10 * Wert(182); //Öffnung Garagenladen
+	//V[27] = Wert(122) * 10; //Aktuelle PV-Leistung PV1
+	//V[28] = Wert(130) * 10; //Aktuelle PV-Leistung PV2
+	//V[29] = Wert(304) * 10; //Aktuelle Leistung PV2; Modul1
+	//V[30] = Wert(310) * 10; //Aktuelle Leistung PV2; Modul2
+	//V[31] = V[27] + V[28];
 
 	int K = Byts[175];	//Behälter und Strömungswächter
 	bitWrite(K, 3, bitRead(Byts[177], 7));//Melder Behälter3 leer
@@ -107,8 +107,8 @@ void VituinoAbfragen()
 	//Einzelbits für Virtuino zusammenstellen (siehe Tabelle Variablen)
 	K = Byts[179]; //Relais Tauchpumpe 1u.2, Zusatzpumpe Heizkörper Arbeitszimmer (Bit3)
 	//bitWrite(K, 2, xxx);  Relais 3 ist noch frei!
-	bitWrite(K, 4, Byts[114]); //Heizkreispumpe
-	bitWrite(K, 5, Byts[137]); //Speicherladepumpe
+	bitWrite(K, 4, Byts[111]); //Heizkreispumpe
+	bitWrite(K, 5, Byts[1118]); //Speicherladepumpe
 	bitWrite(K, 6, bitRead(Byts[179], 6)); //Rückmeldung Garage
 	bitWrite(K, 7, bitRead(Byts[179], 7)); //Rückmeldung Keller, kommt von Raspberry --> überprüfen
 	V[33] = K;
@@ -132,6 +132,8 @@ void VituinoAbfragen()
 	V[60] = V[56] + V[58];	//Pool Leistung B + PV2Leistung
 	V[61] = -(V[60]) + Stromwert(341);	//PV-Leistung gesamt + aktuelle Leistung Hauptstromzähler
 	V[62] = StromDiff;
+	V[63] = EingespeistDiff;
+	V[64] = ZweiByteStrom(274);
 	V[79] = Neustarts;
 
 	/*
@@ -211,6 +213,7 @@ void StandGesternVonRaspberryLesen()
 		WasserGestern = SelektiereWert(Inhalt, "ZSWasser=");
 		BrauchwasserGestern = SelektiereWert(Inhalt, "ZSBrauchwasser=");
 		StromGestern = SelektiereWert(Inhalt, "ZSHauptZ=");
+		EingespeistGestern = SelektiereWert(Inhalt, "ZSEingesp=");
 		Serial.print("GasGestern = ");
 		Serial.println(GasGestern);
 		Serial.print("WasserGestern = ");
@@ -219,6 +222,8 @@ void StandGesternVonRaspberryLesen()
 		Serial.println(BrauchwasserGestern);
 		Serial.print("StromGestern = ");
 		Serial.println(StromGestern);
+		Serial.print("EingespeistGestern = ");
+		Serial.println(EingespeistGestern);
 	}
 	else {
 		Serial.println("Fehler beim Abrufen der Datei");
@@ -261,12 +266,14 @@ void AktuellerZaehlerstand()
 	GasHeute = StandHeute(298);
 	WasserHeute=StandHeute(301);
 	BrauchwasserHeute=StandHeute(295);
-	StromHeute = StandStrom();
+	StromHeute = StandStrom(331);
+	EingespeistHeute= StandStrom(335);
 
 	GasDiff = (GasHeute - GasGestern) * 1000;
 	WasserDiff = (WasserHeute - WasserGestern) * 1000;
 	BrauchwasserDiff = (BrauchwasserHeute - BrauchwasserGestern) * 1000;
 	StromDiff = (StromHeute -StromGestern) * 1000;
+	EingespeistDiff = (EingespeistHeute - EingespeistGestern) * 1000;
 	
 /*	
 	Serial.print("StromHeute = ");
@@ -296,12 +303,12 @@ void AktuellerZaehlerstand()
 }
 
 //********************************************************************
-float StandStrom ()
+float StandStrom (int BytNr)
 {
-uint32_t zahl = (uint32_t)Byts[334] |
-((uint32_t)Byts[333] << 8) |
-((uint32_t)Byts[332] << 16) |
-((uint32_t)Byts[331] << 24);
+uint32_t zahl = (uint32_t)Byts[BytNr+3] |
+((uint32_t)Byts[BytNr+2] << 8) |
+((uint32_t)Byts[BytNr+1] << 16) |
+((uint32_t)Byts[BytNr] << 24);
 
 // Division durch 10000
 float Erg = zahl / 10000.0;

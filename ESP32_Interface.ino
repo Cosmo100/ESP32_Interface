@@ -35,15 +35,19 @@ float GasGestern;
 float WasserGestern;
 float BrauchwasserGestern;
 float StromGestern;
+float EingespeistGestern;
 
 float GasDiff;
 float WasserDiff;
 float BrauchwasserDiff;
 float StromDiff;
+float EingespeistDiff;
+
 float GasHeute;
 float WasserHeute;
 float BrauchwasserHeute;
 float StromHeute;
+float EingespeistHeute;
 
 WiFiServer server(6222);                   // Default Virtuino Server port 
 VirtuinoCM virtuino;
@@ -109,13 +113,14 @@ void loop() {
 	  SendeWert("Neustarts",  String(Neustarts));
 
 	  DatenAbholen();
-	 if (GasGestern < 9300 || WasserGestern < 180 || BrauchwasserGestern < 1950 || StromGestern < 10000)  StandGesternVonRaspberryLesen();
+	 if (GasGestern < 9300 || WasserGestern < 180 || BrauchwasserGestern < 1950 )  StandGesternVonRaspberryLesen();
 	
 	  AktuellerZaehlerstand(); //Gas und Wasser, Brauchwasser
 
 	  SendeWert("Gas", String(GasDiff));
 	  SendeWert("Wasser", String(WasserDiff));
 	  SendeWert("Strom", String(StromDiff));
+	  SendeWert("Eingespeist", String(EingespeistDiff));
 	  SendeWert("Brauchwasser", String(BrauchwasserDiff));
 
 	  Serial.println();
