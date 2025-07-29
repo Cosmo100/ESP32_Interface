@@ -50,6 +50,7 @@ float StromHeute;
 float EingespeistHeute;
 
 WiFiServer server(6222);                   // Default Virtuino Server port 
+WiFiServer server80(80);
 VirtuinoCM virtuino;
 
 const char* TZ_INFO = "CET-1CEST,M3.5.0,M10.5.0/3";    //Wird benötigt für NTP-Zeit
@@ -79,7 +80,9 @@ void setup() {
   Serial.print("IP-Adresse: ");
   Serial.println(WiFi.localIP());
   server.begin();
-  ZeitSetzen();			//NTP Server abfragen
+  server80.begin();	//für die HTML-Seite
+ 
+ZeitSetzen();			//NTP Server abfragen
 
   // UDP starten
   udp.begin(localUdpPort);
@@ -99,12 +102,14 @@ void setup() {
 
   esp_task_wdt_init(WDT_TIMEOUT, true);
   esp_task_wdt_add(NULL); //add current thread to WDT watch
+
   
 }
 
 void loop() {
 
   virtuinoRun();        // Necessary function to communicate with Virtuino. Client handler
+  HTMLServer();
   if (millis() > Sendezeit + Sendepause)  //wenn die Zeit sich ge�ndert hat
   {
 	  Sendezeit = millis();

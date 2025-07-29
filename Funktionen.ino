@@ -56,6 +56,15 @@ float ZweiByteStrom(int ST)
 	return (float) result / 10;
 	}
 
+//==============================================================
+float DreiByteStrom(int ST)
+{
+	int32_t result = (int16_t(Byts[ST]) << 16) | (Byts[ST + 1] << 8) | Byts[ST + 2];
+	if (result & 0x800000) { result |= 0xFF000000; } // Setze die oberen Bits auf 1, um negativ zu machen
+	return (float)result / 10;
+}
+
+
 //###############################################################################################
 void VituinoAbfragen()
 {
@@ -94,10 +103,10 @@ void VituinoAbfragen()
 	V[25] = V[18] - NiveauAltPool;
 
 	//V[26] = 10 * Wert(182); //Öffnung Garagenladen
-	//V[27] = Wert(122) * 10; //Aktuelle PV-Leistung PV1
-	//V[28] = Wert(130) * 10; //Aktuelle PV-Leistung PV2
-	//V[29] = Wert(304) * 10; //Aktuelle Leistung PV2; Modul1
-	//V[30] = Wert(310) * 10; //Aktuelle Leistung PV2; Modul2
+	//V[27] = -Stromwert(270); //Aktuelle PV-Leistung PV1
+	V[28] = Stromwert(308); //Aktuelle PV-Leistung PV2
+	V[29] = Stromwert(304); //Aktuelle Leistung PV2; Modul1
+	V[30] = Stromwert(306); //Aktuelle Leistung PV2; Modul2
 	//V[31] = V[27] + V[28];
 
 	int K = Byts[175];	//Behälter und Strömungswächter
@@ -134,6 +143,13 @@ void VituinoAbfragen()
 	V[62] = StromDiff;
 	V[63] = EingespeistDiff;
 	V[64] = ZweiByteStrom(274);
+
+	V[65] = DreiByteStrom(57);  //Smartmeter Phase A
+	V[66] = DreiByteStrom(60);	//Smartmeter Phase B
+	V[67] = DreiByteStrom(63);	//Smartmeter Phase C
+	V[68] = DreiByteStrom(66);	//Smartmeter Phase Alle Wirk
+	V[69] = DreiByteStrom(69);	//Smartmeter Phase Alle Schein
+
 	V[79] = Neustarts;
 
 	/*
