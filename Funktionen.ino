@@ -216,7 +216,7 @@ void StandGesternVonRaspberryLesen()
 {
 	Serial.println("Lese Stand gestern");
 	//Liest Datei von Raspberry aus mnt/ramdisk
-	const char*	fileUrl = "http://heisopi:8080/Zaehlergestern.heis";
+	const char*	fileUrl = "http://speicher/ramdisk/Zaehlergestern.heis";
 	HTTPClient http;
 	http.begin(fileUrl);
 
@@ -285,7 +285,7 @@ void AktuellerZaehlerstand()
 	StromHeute = StandStrom(331);
 	EingespeistHeute= StandStrom(335);
 
-	GasDiff = (GasHeute - GasGestern) * 1000;
+	GasDiff = (GasHeute - GasGestern)  * 1000;
 	WasserDiff = (WasserHeute - WasserGestern) * 1000;
 	BrauchwasserDiff = (BrauchwasserHeute - BrauchwasserGestern) * 1000;
 	StromDiff = (StromHeute -StromGestern) * 1000;
