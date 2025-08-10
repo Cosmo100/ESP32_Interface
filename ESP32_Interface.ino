@@ -66,6 +66,9 @@ void setup() {
   Serial.begin(115200);
   EEPROM.begin(EEPROM_SIZE);
 
+  esp_task_wdt_init(WDT_TIMEOUT, true);
+  esp_task_wdt_add(NULL); //add current thread to WDT watch
+
   virtuino.begin(onReceived, onRequested, 256);  //Start Virtuino. Set the buffer to 256. With this buffer Virtuino can control about 28 pins (1 command = 9bytes) The T(text) commands with 20 characters need 20+6 bytes
  //virtuino.key="1234";        //This is the Virtuino password. Only requests the start with this key are accepted from the library
   Serial.println("Starte UDP-Empfänger");
@@ -99,11 +102,7 @@ ZeitSetzen();			//NTP Server abfragen
 
   StandGesternVonRaspberryLesen();
   AktuellerZaehlerstand(); //Gas und Wasser
-
-  esp_task_wdt_init(WDT_TIMEOUT, true);
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
-
-  
+    
 }
 
 void loop() {
