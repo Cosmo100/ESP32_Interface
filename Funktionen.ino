@@ -1,4 +1,4 @@
-
+ï»¿
 // Funktion zum Parsen des Byte-Strings
 void parseByteString(const char *input, uint8_t *output, size_t *output_len) {
 	char *token;
@@ -11,13 +11,13 @@ void parseByteString(const char *input, uint8_t *output, size_t *output_len) {
 		token = strtok(NULL, ", ");
 	}
 
-	*output_len = index; // Speichere die Länge des Bytearrays
+	*output_len = index; // Speichere die LÃ¤nge des Bytearrays
 	free(input_copy);    // Speicher freigeben
 }
 //==============================================================
 void DatenAbholen()
 {	//Daten werden vom Raspberry bei jedem Durchgang gesendet
-	int packetSize = udp.parsePacket(); // Prüfen, ob ein Paket empfangen wurde
+	int packetSize = udp.parsePacket(); // PrÃ¼fen, ob ein Paket empfangen wurde
 
 	if (packetSize) {
 		Serial.print("Paketgroesse[");
@@ -102,28 +102,28 @@ void VituinoAbfragen()
 	V[24] = V[21] - NiveauAlt3;
 	V[25] = V[18] - NiveauAltPool;
 
-	//V[26] = 10 * Wert(182); //Öffnung Garagenladen
+	//V[26] = 10 * Wert(182); //Ã–ffnung Garagenladen
 	//V[27] = -Stromwert(270); //Aktuelle PV-Leistung PV1
 	V[28] = Stromwert(308); //Aktuelle PV-Leistung PV2
 	V[29] = Stromwert(304); //Aktuelle Leistung PV2; Modul1
 	V[30] = Stromwert(306); //Aktuelle Leistung PV2; Modul2
 	//V[31] = V[27] + V[28];
 
-	int K = Byts[175];	//Behälter und Strömungswächter
-	bitWrite(K, 3, bitRead(Byts[177], 7));//Melder Behälter3 leer
+	int K = Byts[175];	//BehÃ¤lter und StrÃ¶mungswÃ¤chter
+	bitWrite(K, 3, bitRead(Byts[177], 7));//Melder BehÃ¤lter3 leer
 	V[32] = K;
 
-	//Einzelbits für Virtuino zusammenstellen (siehe Tabelle Variablen)
-	K = Byts[179]; //Relais Tauchpumpe 1u.2, Zusatzpumpe Heizkörper Arbeitszimmer (Bit3)
+	//Einzelbits fÃ¼r Virtuino zusammenstellen (siehe Tabelle Variablen)
+	K = Byts[179]; //Relais Tauchpumpe 1u.2, Zusatzpumpe HeizkÃ¶rper Arbeitszimmer (Bit3)
 	//bitWrite(K, 2, xxx);  Relais 3 ist noch frei!
 	bitWrite(K, 4, Byts[111]); //Heizkreispumpe
 	bitWrite(K, 5, Byts[1118]); //Speicherladepumpe
-	bitWrite(K, 6, bitRead(Byts[179], 6)); //Rückmeldung Garage
-	bitWrite(K, 7, bitRead(Byts[179], 7)); //Rückmeldung Keller, kommt von Raspberry --> überprüfen
+	bitWrite(K, 6, bitRead(Byts[179], 6)); //RÃ¼ckmeldung Garage
+	bitWrite(K, 7, bitRead(Byts[179], 7)); //RÃ¼ckmeldung Keller, kommt von Raspberry --> Ã¼berprÃ¼fen
 	V[33] = K;
 
 	K = Byts[178];  					   //Filterpumpe, Heizventil, Heizpumpe Pool, Tauchpumpe 3
-	bitWrite(K, 4, bitRead(Byts[176], 6)); //Lese Zustand des Bewässerungsventils
+	bitWrite(K, 4, bitRead(Byts[176], 6)); //Lese Zustand des BewÃ¤sserungsventils
 	V[34] = K;  				
 
 	V[36] = GasHeute;
@@ -139,7 +139,7 @@ void VituinoAbfragen()
 		V[i + 42] = ZweiByteStrom(i * 2 + 238);  //V[41] bis V[59]
 	}
 	V[60] = V[56] + V[58];	//Pool Leistung B + PV2Leistung
-	V[61] = -(V[60]) + Stromwert(341);	//PV-Leistung gesamt + aktuelle Leistung Hauptstromzähler
+	V[61] = -(V[60]) + Stromwert(341);	//PV-Leistung gesamt + aktuelle Leistung HauptstromzÃ¤hler
 	V[62] = StromDiff;
 	V[63] = EingespeistDiff;
 	V[64] = ZweiByteStrom(274);
@@ -173,11 +173,11 @@ void VituinoAbfragen()
 		}
 
 
-//	if (hour() == 0 && minute() == 0)  NiveauAlt1 = 0;  //Um 0.00 Uhr AltNiveaus zurücksetzen
+//	if (hour() == 0 && minute() == 0)  NiveauAlt1 = 0;  //Um 0.00 Uhr AltNiveaus zurÃ¼cksetzen
 }
 //###############################################################################################
 void BefehlVonAndroid()
-{	//Bei jedem Durchlauf wird Überprüft, ob ein Befehl von Android vorliegt
+{	//Bei jedem Durchlauf wird ÃœberprÃ¼ft, ob ein Befehl von Android vorliegt
 	unsigned int Befehl = V[80];	//Befehl von Android
 	switch (Befehl)
 	{
@@ -216,7 +216,7 @@ void StandGesternVonRaspberryLesen()
 {
 	Serial.println("Lese Stand gestern");
 	//Liest Datei von Raspberry aus mnt/ramdisk
-	const char*	fileUrl = "http://speicher/ramdisk/Zaehlergestern.heis";
+	String fileUrl = "http://" + Server + "/ramdisk/Zaehlergestern.heis";
 	HTTPClient http;
 	http.begin(fileUrl);
 
@@ -344,7 +344,7 @@ void SendeWert(String Bez,String Wert)
 //####################### Befehl von PC lesen ###################################################
 //###############################################################################################
 void PCBefehlAbfragen()
-{ //serialEvent ist bei ESP32 nicht möglich
+{ //serialEvent ist bei ESP32 nicht mÃ¶glich
 
 	String Bef;
 
@@ -369,7 +369,7 @@ void PCBefehlAbfragen()
 		//Text_2 = "Neustart";
 		Reset();
 	}
-	else if (Bef == "CLRNeustart") //Löschen der Neustarts im Eprom des ESP
+	else if (Bef == "CLRNeustart") //LÃ¶schen der Neustarts im Eprom des ESP
 	{
 		LoescheNeustarts();
 	}
@@ -386,7 +386,7 @@ void LoescheNeustarts()
 	Serial.println("Loesche Anzahl Neustart");
 
 	EEPROM.write(0, 0); //Setze Adresse 0 auf 0 Neustarts
-	EEPROM.commit(); // Damit die Daten tatsächlich in den Flash geschrieben werden
+	EEPROM.commit(); // Damit die Daten tatsÃ¤chlich in den Flash geschrieben werden
 	Neustarts = EEPROM.read(0); //Lese neue Anzahl von Neustarts Neustarts
 }
 //==============================================================
@@ -406,7 +406,7 @@ String AktuelleZeit()
 	if (getLocalTime(&timeinfo))
 	{
 		strftime(Zeit, sizeof(Zeit), "%H:%M:%S", &timeinfo);
-		Text_0 = Zeit;  //ohne Klammern an Virtuino übergeben
+		Text_0 = Zeit;  //ohne Klammern an Virtuino Ã¼bergeben
 
 		//Um 01:01 Stand von gestern neu lesen
 		if (timeinfo.tm_hour == 1 && timeinfo.tm_min < 5)  StandGesternVonRaspberryLesen();
@@ -427,9 +427,25 @@ String AktuellesDatum()
 		// Datum als String formatieren
 
 		strftime(Datum, sizeof(Datum), "%d.%m.%Y", &timeinfo);
-		Text_1 = Datum;  //ohne Klammern an Virtuino übergeben
+		Text_1 = Datum;  //ohne Klammern an Virtuino Ã¼bergeben
 		return Datum;
 	}
 }
-
 //==============================================================
+void CheckServer()
+{
+	WiFiClient client;
+
+	Serial.print("PrÃ¼fe Server speicher");
+
+	if (client.connect("speicher", 80)) {
+		Serial.println(".. - erreichbar!");
+		Server = "speicher";
+		client.stop();
+	}
+	else {
+		Serial.println("nicht erreichbar!");
+		Server = "heisopi";
+	}
+
+}
