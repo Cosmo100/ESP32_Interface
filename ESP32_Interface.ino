@@ -61,7 +61,7 @@ int Neustarts;
 bool debug = false;
 unsigned long Sendezeit = millis();
 const int Sendepause = 3000;  //Sendepause in Sekunden zur Datenuebertragungin msec
-String Server = "speicher";
+
 
 void setup() {
   Serial.begin(115200);
@@ -101,7 +101,7 @@ ZeitSetzen();			//NTP Server abfragen
   EEPROM.write(0, Neustarts);
   EEPROM.commit(); // Damit die Daten tatsächlich in den Flash geschrieben werden
 
-  CheckServer();  //festlegen ob Raspberry-Host speicher oder heisopi ist
+  //CheckServer();  //festlegen ob Raspberry-Host speicher oder heisopi ist
 
   StandGesternVonRaspberryLesen();
   AktuellerZaehlerstand(); //Gas und Wasser

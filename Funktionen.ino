@@ -216,7 +216,7 @@ void StandGesternVonRaspberryLesen()
 {
 	Serial.println("Lese Stand gestern");
 	//Liest Datei von Raspberry aus mnt/ramdisk
-	String fileUrl = "http://" + Server + "/ramdisk/Zaehlergestern.heis";
+	String fileUrl = "http://heisopi/ramdisk/Zaehlergestern.heis";
 	HTTPClient http;
 	http.begin(fileUrl);
 
@@ -440,12 +440,12 @@ void CheckServer()
 
 	if (client.connect("speicher", 80)) {
 		Serial.println(".. - erreichbar!");
-		Server = "speicher";
+		//Server = "speicher";
 		client.stop();
 	}
 	else {
 		Serial.println("nicht erreichbar!");
-		Server = "heisopi";
+		//Server = "heisopi";
 	}
 
 }
