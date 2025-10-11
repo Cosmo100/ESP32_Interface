@@ -124,6 +124,7 @@ void loop() {
 	  DatenAbholen();
 	 if (GasGestern < 9300 || WasserGestern < 180 || BrauchwasserGestern < 1950 )  StandGesternVonRaspberryLesen();
 	
+	
 	  AktuellerZaehlerstand(); //Gas und Wasser, Brauchwasser
 
 	  SendeWert("Gas", String(GasDiff));

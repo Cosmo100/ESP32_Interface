@@ -214,11 +214,11 @@ float Stromwert(int BytNr)
 //*********************************************************
 void StandGesternVonRaspberryLesen()
 {
-	Serial.println("Lese Stand gestern");
-	//Liest Datei von Raspberry aus mnt/ramdisk
-	String fileUrl = "http://heisopi/ramdisk/Zaehlergestern.heis";
-	HTTPClient http;
-	http.begin(fileUrl);
+		Serial.println("Lese Stand gestern");
+		//Liest Datei von Raspberry aus mnt/ramdisk
+		String fileUrl = "http://heisopi:8080/Zaehlergestern.heis";
+		HTTPClient http;
+		http.begin(fileUrl);
 
 	int httpCode = http.GET();
 	if (httpCode > 0) {
@@ -248,11 +248,13 @@ void StandGesternVonRaspberryLesen()
 }
 
 //*********************************************************
-float StandHeute(int ST)
+float StandHeute(int BytNr)
 {
-	uint32_t result = (uint32_t(Byts[ST+2]) << 16) | (uint32_t(Byts[ST + 1]) << 8) | Byts[ST];
+	uint32_t zahl = ((uint32_t)Byts[BytNr + 2] << 16) | ((uint32_t)Byts[BytNr + 1] << 8) | Byts[BytNr];
+	// Division durch 1000
+	float Erg = zahl / 1000.0;
 
-	return (float) result / 1000;
+	return Erg;
 }
 //*********************************************************
 
@@ -291,7 +293,7 @@ void AktuellerZaehlerstand()
 	StromDiff = (StromHeute -StromGestern) * 1000;
 	EingespeistDiff = (EingespeistHeute - EingespeistGestern) * 1000;
 	
-/*	
+
 	Serial.print("StromHeute = ");
 	Serial.println(StromHeute);
 	Serial.print("StromGestern = ");
@@ -314,7 +316,7 @@ void AktuellerZaehlerstand()
 	Serial.print("GasDiff = ");
 	Serial.println(GasDiff);
 	Serial.print("WasserDiff = ");
-	Serial.println(WasserDiff);*/
+	Serial.println(WasserDiff);
 	
 }
 
