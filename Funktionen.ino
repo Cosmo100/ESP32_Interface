@@ -150,6 +150,13 @@ void VituinoAbfragen()
 	V[68] = DreiByteStrom(66);	//Smartmeter Phase Alle Wirk
 	V[69] = DreiByteStrom(69);	//Smartmeter Phase Alle Schein
 
+
+	V[70] = 10 * ZweiByteStrom(128); //PV-Anlage1 Modul 1
+	V[71] = 10 * ZweiByteStrom(130);	//PV-Anlage1 Modul 2
+	V[72] = 10 * ZweiByteStrom(132);	//PV-Anlage1 Modul 3
+	V[73] = 10 * ZweiByteStrom(134);	//PV-Anlage1 Modul 4
+	V[74] = V[70]+ V[71]+ V[72]+ V[73];	//Gesamtproduktion PV1
+	V[75] = 10 * ZweiByteStrom(136);	//Batterie
 	V[79] = Neustarts;
 
 	/*
