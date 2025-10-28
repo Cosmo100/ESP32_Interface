@@ -417,8 +417,8 @@ String AktuelleZeit()
 		strftime(Zeit, sizeof(Zeit), "%H:%M:%S", &timeinfo);
 		Text_0 = Zeit;  //ohne Klammern an Virtuino übergeben
 
-		//Um 01:01 Stand von gestern neu lesen
-		if (timeinfo.tm_hour == 1 && timeinfo.tm_min < 5)  StandGesternVonRaspberryLesen();
+		//Um 03:04 Stand von gestern neu lesen
+		if (timeinfo.tm_hour == 3 && timeinfo.tm_min == 4)  StandGesternVonRaspberryLesen();
 
 		return Zeit;
 	}
