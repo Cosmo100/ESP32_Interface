@@ -16,6 +16,7 @@
 // UDP-Parameter
 WiFiUDP udp;
 const int localUdpPort = 1902; // Port, auf dem der ESP32 hört
+
 uint8_t Byts[360];
 size_t BytsLen = 0;
 char packetBuffer[1500]; // Puffer für eingehende Pakete
@@ -51,6 +52,7 @@ float EingespeistHeute;
 
 WiFiServer server(6222);                   // Default Virtuino Server port 
 WiFiServer server80(80);
+
 VirtuinoCM virtuino;
 
 const char* TZ_INFO = "CET-1CEST,M3.5.0,M10.5.0/3";    //Wird benötigt für NTP-Zeit
@@ -61,7 +63,7 @@ int Neustarts;
 bool debug = false;
 unsigned long Sendezeit = millis();
 const int Sendepause = 3000;  //Sendepause in Sekunden zur Datenuebertragungin msec
-
+String StandPV1 = "";
 
 void setup() {
   Serial.begin(115200);
@@ -83,9 +85,11 @@ void setup() {
   Serial.println("\nWLAN verbunden.");
   Serial.print("IP-Adresse: ");
   Serial.println(WiFi.localIP());
+
   server.begin();
   server80.begin();	//für die HTML-Seite
  
+
 ZeitSetzen();			//NTP Server abfragen
 
   // UDP starten
@@ -105,7 +109,7 @@ ZeitSetzen();			//NTP Server abfragen
 
   StandGesternVonRaspberryLesen();
   AktuellerZaehlerstand(); //Gas und Wasser
-    
+ 
 }
 
 void loop() {
@@ -117,9 +121,9 @@ void loop() {
   if (millis() > Sendezeit + Sendepause)  //wenn die Zeit sich ge�ndert hat
   {
 	  Sendezeit = millis();
-	  SendeWert("Zeit", AktuelleZeit());
-	  SendeWert("Datum", AktuellesDatum());
-	  SendeWert("Neustarts",  String(Neustarts));
+	  SchreibeWert("Zeit", AktuelleZeit());
+	  SchreibeWert("Datum", AktuellesDatum());
+	  SchreibeWert("Neustarts",  String(Neustarts));
 
 	  DatenAbholen();
 	 if (GasGestern < 9300 || WasserGestern < 180 || BrauchwasserGestern < 1950 )  StandGesternVonRaspberryLesen();
@@ -127,12 +131,13 @@ void loop() {
 	
 	  AktuellerZaehlerstand(); //Gas und Wasser, Brauchwasser
 
-	  SendeWert("Gas", String(GasDiff));
-	  SendeWert("Wasser", String(WasserDiff));
-	  SendeWert("Strom", String(StromDiff));
-	  SendeWert("Eingespeist", String(EingespeistDiff));
-	  SendeWert("Brauchwasser", String(BrauchwasserDiff));
+	  SchreibeWert("Gas", String(GasDiff));
+	  SchreibeWert("Wasser", String(WasserDiff));
+	  SchreibeWert("Strom", String(StromDiff));
+	  SchreibeWert("Eingespeist", String(EingespeistDiff));
+	  SchreibeWert("Brauchwasser", String(BrauchwasserDiff));
 
+	  ZaehlerstandPV1Lesen();
 	  Serial.println();
  }
 

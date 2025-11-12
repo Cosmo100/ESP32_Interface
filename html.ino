@@ -52,8 +52,9 @@ String HTML()
 
 	html += "th{background: #FFFFCC;font-weight: bold;font-size:160% ;font-style: italic;text-align : center; border: 10px ridge #39F;}";
 	html += "TABLE.Daten{background: #FFFFCC; border: 10px ridge #39F;}";
+	html += "TD.Dat0{border: 1px solid rgb(200,200,200); font-weight:bold; width: 50px;text-align:right;vertical-align: middle;}";
 	html += "TD.Dat1{border: 1px solid rgb(200,200,200); font-weight:bold; width: 400px;text-align:right;vertical-align: middle;}";
-	html += "TD.Dat2{border: 1px solid rgb(200,200,200); font-weight:bold; width: 250px;text-align:right;vertical-align: middle;}";
+	html += "TD.Dat2{border: 1px solid rgb(200,200,200); font-weight:bold; width: 200px;text-align:right;vertical-align: middle;}";
 	html += "</style>";
 
 	html += "</head><body><div align='center'>";
@@ -68,8 +69,9 @@ String HTML()
 	for (int i = 0; i < 70; i++)
 		{
 		html += "<tr>";
+		html += "<td class = 'Dat0'>" + String(i) + "</td>";
 		html += "<td class = 'Dat1'>" + Bezeichnung[i] + "</td>";
-		html += "<td class = 'Dat2'>" + String(V[i],1) + " " + Einheit[i]+"</td>";
+		html += "<td class = 'Dat2'>" +  String(V[i],1) + " " + Einheit[i]+"</td>";
 		//html += "<td class = 'Dat2'>" + String(S[i],2) + " kWh</td>";
 		html += "</tr>";
 		}

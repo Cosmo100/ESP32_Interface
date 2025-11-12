@@ -17,9 +17,12 @@ void parseByteString(const char *input, uint8_t *output, size_t *output_len) {
 //==============================================================
 void DatenAbholen()
 {	//Daten werden vom Raspberry bei jedem Durchgang gesendet
+
+
 	int packetSize = udp.parsePacket(); // Prüfen, ob ein Paket empfangen wurde
 
 	if (packetSize) {
+
 		Serial.print("Paketgroesse[");
 		Serial.print(packetSize);
 		Serial.println("]");
@@ -46,6 +49,7 @@ void DatenAbholen()
 		Serial.print(BytsLen);
 		Serial.println("]");
 	
+		
 	}
 }
 
@@ -253,6 +257,36 @@ void StandGesternVonRaspberryLesen()
 	}
 	http.end();
 }
+//*********************************************************
+void ZaehlerstandPV1Lesen()
+{
+	//Liest die aktuelle Arbeit der einzelnen PV Module von PV1 aus der Ramdisk des Raspberry
+	//Und sendet diese per UDP wieder an den Raspberry
+	
+	Serial.println("\nLetzter PV1-Stand");
+	//Liest Datei von Raspberry aus mnt/ramdisk
+	String fileUrl = "http://heisopi:8080/Datum.heis";
+	HTTPClient http;
+	http.begin(fileUrl);
+
+	int httpCode = http.GET();
+	if (httpCode > 0) {
+		StandPV1 = http.getString();
+		Serial.println(StandPV1);
+
+	   //Sende StandPV1 zurück an Raspberry
+		udp.beginPacket("heisopi", 1305);
+		udp.write((const uint8_t*)StandPV1.c_str(), StandPV1.length());
+		udp.endPacket();
+
+	}
+	else {
+		Serial.println("Fehler beim Abrufen der Datei");
+	}
+	http.end();
+	Serial.print("StandPV1=");
+	Serial.println(StandPV1);
+}
 
 //*********************************************************
 float StandHeute(int BytNr)
@@ -343,7 +377,7 @@ return Erg;
 }
 
 //********************************************************************
-void SendeWert(String Bez,String Wert)
+void SchreibeWert(String Bez,String Wert)
 {
 	String Sende = Bez + "[" + Wert + "]";
 	Serial.println(Sende);
