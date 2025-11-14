@@ -263,7 +263,7 @@ void ZaehlerstandPV1Lesen()
 	//Liest die aktuelle Arbeit der einzelnen PV Module von PV1 aus der Ramdisk des Raspberry
 	//Und sendet diese per UDP wieder an den Raspberry
 	
-	Serial.println("\nLetzter PV1-Stand");
+	//Serial.println("\nLetzter PV1-Stand");
 	//Liest Datei von Raspberry aus mnt/ramdisk
 	String fileUrl = "http://heisopi:8080/Datum.heis";
 	HTTPClient http;
@@ -272,20 +272,25 @@ void ZaehlerstandPV1Lesen()
 	int httpCode = http.GET();
 	if (httpCode > 0) {
 		StandPV1 = http.getString();
-		Serial.println(StandPV1);
-
-	   //Sende StandPV1 zurück an Raspberry
-		udp.beginPacket("heisopi", 1305);
-		udp.write((const uint8_t*)StandPV1.c_str(), StandPV1.length());
-		udp.endPacket();
-
+		//Serial.println(StandPV1);
 	}
 	else {
 		Serial.println("Fehler beim Abrufen der Datei");
 	}
 	http.end();
-	Serial.print("StandPV1=");
+	
+}
+//*********************************************************
+void SendePV1anRasp()
+{
+//Sende StandPV1 zurück an Raspberry
+	
+	Serial.println("Sende StandPV1");
 	Serial.println(StandPV1);
+
+		udp.beginPacket("heisopi", 1305);
+		udp.write((const uint8_t*)StandPV1.c_str(), StandPV1.length());
+		udp.endPacket();
 }
 
 //*********************************************************

@@ -109,7 +109,7 @@ ZeitSetzen();			//NTP Server abfragen
 
   StandGesternVonRaspberryLesen();
   AktuellerZaehlerstand(); //Gas und Wasser
- 
+  
 }
 
 void loop() {
@@ -138,9 +138,11 @@ void loop() {
 	  SchreibeWert("Brauchwasser", String(BrauchwasserDiff));
 
 	  ZaehlerstandPV1Lesen();
+	  SendePV1anRasp();
 	  Serial.println();
  }
 
+  
   VituinoAbfragen();
   PCBefehlAbfragen();
 
