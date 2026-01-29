@@ -109,9 +109,9 @@ void VituinoAbfragen()
 	//V[26] = 10 * Wert(182); //Öffnung Garagenladen
 	//V[27] = -Stromwert(270); //Aktuelle PV-Leistung PV1
 	V[28] = Stromwert(308); //Aktuelle PV-Leistung PV2
-	V[29] = Stromwert(304); //Aktuelle Leistung PV2; Modul1
-	V[30] = Stromwert(306); //Aktuelle Leistung PV2; Modul2
-	//V[31] = V[27] + V[28];
+	V[29] = Stromwert(82); //Aktuelle Leistung PV2; Modul1
+	V[30] = Stromwert(84); //Aktuelle Leistung PV2; Modul2
+	V[31] = V[29] + V[30];
 
 	int K = Byts[175];	//Behälter und Strömungswächter
 	bitWrite(K, 3, bitRead(Byts[177], 7));//Melder Behälter3 leer
