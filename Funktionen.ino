@@ -160,7 +160,8 @@ void VituinoAbfragen()
 	V[72] = 10 * ZweiByteStrom(132);	//PV-Anlage1 Modul 3
 	V[73] = 10 * ZweiByteStrom(134);	//PV-Anlage1 Modul 4
 	V[74] = V[70]+ V[71]+ V[72]+ V[73];	//Gesamtproduktion PV1
-	V[75] = 10 * ZweiByteStrom(136);	//Batterie
+	V[75] = 10 * ZweiByteStrom(136);	//Batterie PV1
+	V[76] = Byts[90];	//Batterie PV2
 	V[79] = Neustarts;
 
 	/*
